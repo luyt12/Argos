@@ -6,6 +6,7 @@ import sys
 import re
 import ssl
 import smtplib
+import glob
 from datetime import datetime
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -26,7 +27,7 @@ if _missing:
     sys.exit(1)
 
 TRANSLATE_DIR = "translate"
-BRAND_COLOR = "#8B0000"  # FP red
+BRAND_COLOR = "#8B0000"
 
 
 def format_html(content, date_str):
@@ -43,32 +44,32 @@ def format_html(content, date_str):
         date_fmt = date_str
 
     html = (
-        "<!DOCTYPE html><html><head><meta charset=\"utf-8\">" +
-        "<style>" +
+        "<!DOCTYPE html><html><head><meta charset=\"utf-8\">"
+        "<style>"
         "body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,serif;"
         "line-height:1.8;color:#222;max-width:800px;margin:0 auto;padding:20px;"
-        "background:#f5f5f0}" +
+        "background:#f5f5f0}"
         ".container{background:#fff;padding:30px;border-radius:6px;"
-        "box-shadow:0 2px 10px rgba(0,0,0,0.08)}" +
+        "box-shadow:0 2px 10px rgba(0,0,0,0.08)}"
         ".header{border-bottom:2px solid " + BRAND_COLOR + ";"
-        "padding-bottom:15px;margin-bottom:25px}" +
-        "h1{color:" + BRAND_COLOR + ";margin:0;font-size:24px;font-family:Georgia,serif}" +
-        ".date{color:#777;font-size:13px;margin-top:6px}" +
+        "padding-bottom:15px;margin-bottom:25px}"
+        "h1{color:" + BRAND_COLOR + ";margin:0;font-size:24px;font-family:Georgia,serif}"
+        ".date{color:#777;font-size:13px;margin-top:6px}"
         "h2{color:#111;font-size:17px;border-top:1px solid #ddd;"
-        "padding-top:18px;margin-top:25px;font-family:Georgia,serif}" +
-        "a{color:#0066cc;text-decoration:none}" +
-        "a:hover{text-decoration:underline}" +
-        "p{margin:10px 0}" +
+        "padding-top:18px;margin-top:25px;font-family:Georgia,serif}"
+        "a{color:#0066cc;text-decoration:none}"
+        "a:hover{text-decoration:underline}"
+        "p{margin:10px 0}"
         ".footer{margin-top:40px;padding-top:20px;border-top:1px solid #eee;"
-        "font-size:12px;color:#888;text-align:center}" +
-        "</style></head><body>" +
-        "<div class=\"container\">" +
-        "<div class=\"header\">" +
-        "<h1>Foreign Policy Blogs</h1>" +
-        f"<div class=\"date\">{date_fmt} — 国际事务博客精选</div>" +
-        "</div>" +
-        "<div class=\"content\">" + html_body + "</div>" +
-        "<div class=\"footer\">由 OpenClaw Agent 自动发送 | Foreign Policy Blogs</div>" +
+        "font-size:12px;color:#888;text-align:center}"
+        "</style></head><body>"
+        "<div class=\"container\">"
+        "<div class=\"header\">"
+        "<h1>Foreign Policy Blogs</h1>"
+        f"<div class=\"date\">{date_fmt} — 国际事务博客精选</div>"
+        "</div>"
+        "<div class=\"content\">" + html_body + "</div>"
+        "<div class=\"footer\">由 OpenClaw Agent 自动发送 | Foreign Policy Blogs</div>"
         "</div></body></html>"
     )
     return html
@@ -90,15 +91,15 @@ def send_email(filepath):
     msg["From"]    = EMAIL_FROM
     msg["To"]      = EMAIL_TO
     msg["Subject"] = f"Foreign Policy Blogs — {date_str}"
-
     msg.attach(MIMEText(html, "html", "utf-8"))
 
+    print(f"SMTP: {SMTP_HOST}:{SMTP_PORT} -> {EMAIL_TO}")
     try:
         ctx = ssl.create_default_context()
         with smtplib.SMTP_SSL(SMTP_HOST, SMTP_PORT, context=ctx) as server:
             server.login(SMTP_USER, SMTP_PASS)
             server.sendmail(EMAIL_FROM, [EMAIL_TO], msg.as_string())
-        print("Email sent: " + EMAIL_TO)
+        print("Email sent OK")
         return True
     except Exception as e:
         print("SMTP error: " + str(e))
