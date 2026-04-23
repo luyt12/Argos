@@ -4,17 +4,6 @@ on:
   schedule:
     - cron: '0 12 * * *'  # 20:00 Beijing
   workflow_dispatch:
-    inputs:
-      mode:
-        description: 'Mode: normal | backfill'
-        required: false
-        default: 'normal'
-        type: string
-      backfill_days:
-        description: 'Backfill days'
-        required: false
-        default: '7'
-        type: string
 
 permissions:
   contents: write
@@ -36,11 +25,7 @@ jobs:
         with:
           python-version: '3.11'
       - run: pip install -r requirements.txt
-      - name: Run daily task
-        env:
-          MODE: ${{ github.event.inputs.mode || 'normal' }}
-          BACKFILL_DAYS: ${{ github.event.inputs.backfill_days || '7' }}
-        run: python daily_task.py
+      - run: python daily_task.py
       - name: Commit updates
         run: |
           git config user.name "GitHub Actions"
